@@ -1,9 +1,10 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.contrib.auth.models import User
 from django.utils import timezone
 from rest_framework.test import APIClient
 from rest_framework import status
 from datetime import timedelta
+from unittest.mock import patch
 from .models import Event, EventRegistration
 
 
@@ -83,7 +84,8 @@ class EventAPITest(TestCase):
         response = self.client.post('/api/events/', data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_register_for_event(self):
+    @patch('events.tasks.send_registration_email.delay')
+    def test_register_for_event(self, mock_send_email):
         event = Event.objects.create(
             title='Test Event',
             description='Test Description',
@@ -95,6 +97,9 @@ class EventAPITest(TestCase):
         
         self.client.force_authenticate(user=self.other_user)
         response = self.client.post(f'/api/events/{event.id}/register/')
+        if response.status_code != status.HTTP_201_CREATED:
+            print(f"Response status: {response.status_code}")
+            print(f"Response data: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(
             EventRegistration.objects.filter(
@@ -102,8 +107,10 @@ class EventAPITest(TestCase):
                 event=event
             ).exists()
         )
+        mock_send_email.assert_called_once()
 
-    def test_cannot_register_twice(self):
+    @patch('events.tasks.send_registration_email.delay')
+    def test_cannot_register_twice(self, mock_send_email):
         event = Event.objects.create(
             title='Test Event',
             description='Test Description',

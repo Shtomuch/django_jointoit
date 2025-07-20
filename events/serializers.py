@@ -3,6 +3,12 @@ from django.contrib.auth.models import User
 from .models import Event, EventRegistration
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+
+
 class EventOrganizerSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -60,9 +66,10 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = [
-            'title', 'description', 'date', 'location',
+            'id', 'title', 'description', 'date', 'location',
             'max_attendees', 'is_active'
         ]
+        read_only_fields = ['id']
 
     def validate_date(self, value):
         from django.utils import timezone
@@ -83,9 +90,3 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
             'registered_at', 'is_cancelled', 'cancelled_at'
         ]
         read_only_fields = ['id', 'registered_at', 'cancelled_at']
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name']
