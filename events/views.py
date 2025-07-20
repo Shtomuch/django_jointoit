@@ -27,7 +27,7 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.select_related('organizer').annotate(
         attendees_count=Count('registrations', filter=Q(registrations__is_cancelled=False))
     ).order_by('date')
-    filter_class = EventFilter
+    filterset_class = EventFilter
     search_fields = ['title', 'description', 'location']
     ordering_fields = ['date', 'created_at', 'title']
     permission_classes = [IsAuthenticated, IsOrganizerOrReadOnly]
