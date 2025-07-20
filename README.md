@@ -598,24 +598,6 @@ curl -X POST http://localhost:8000/api/auth/token/refresh/ \
 | `EMAIL_HOST_PASSWORD` | Email password | `''` |
 | `DEFAULT_FROM_EMAIL` | Default sender email | `noreply@eventmanagement.com` |
 
-## Production Deployment
-
-### Security Checklist
-
-1. **Change SECRET_KEY**: Generate a new secret key for production
-2. **Set DEBUG=False**: Never run with debug mode in production
-3. **Configure ALLOWED_HOSTS**: Set specific domains
-4. **Use HTTPS**: Configure SSL/TLS certificates
-5. **Secure Database**: Use strong passwords and restrict access
-6. **Environment Variables**: Never commit sensitive data to version control
-
-### Performance Optimization
-
-1. **Database Connection Pooling**: Configure connection pooling for PostgreSQL
-2. **Redis Configuration**: Use Redis for caching and session storage
-3. **Static Files**: Serve static files through a CDN or nginx
-4. **Gunicorn Workers**: Configure appropriate number of workers
-5. **Database Indexes**: Already configured on frequently queried fields
 
 ### Docker Production Setup
 
